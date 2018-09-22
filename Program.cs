@@ -16,12 +16,12 @@ namespace TShirtCannon
         public const int LEFT_SLAVE_TALON = 4;
         public const int SOLENOID_CONTROLLER = 0;
         // BUTTON MAPPING
-        public const int A_BUTTON = 1;
-        public const int B_BUTTON = 1;
+        public const int A_BUTTON = 2;
+        public const int B_BUTTON = 3;
         public const int X_BUTTON = 1;
-        public const int Y_BUTTON = 1;
-        public const int RIGHT_BUMPER = 1;
-        public const int LEFT_BUMPER = 1;
+        public const int Y_BUTTON = 4;
+        public const int RIGHT_BUMPER = 6;
+        public const int LEFT_BUMPER = 5;
 
         // AXIS MAPPING
         public const int RIGHT_TRIGGER = CTRE.Phoenix.Controller.LogitechGamepad.kAxis_RightShoulder;
@@ -37,7 +37,9 @@ namespace TShirtCannon
 
         // Variables
         public static int currentBarrel = 0;
-        public static bool prevShootState = false;
+        public static bool prevShootStateMain = false;
+        public static bool prevShootStateOne = false;
+        public static bool prevShootStateTwo = false;
 
         public static double[] shootTimers = new double[6];
 
@@ -141,19 +143,21 @@ namespace TShirtCannon
             //Debug.Print(currentBarrel.ToString());
 
             // reload state
-            bool currentreloadstate = m_controller.GetButton(LEFT_BUMPER);
+            //bool currentreloadstate = m_controller.GetButton(LEFT_BUMPER);
 
-            if (!prevReloadState && currentreloadstate)
-            {
-                reloading = !reloading;
-            }
+            //if (!prevReloadState && currentreloadstate)
+            //{
+            //    reloading = !reloading;
+            //}
 
-            prevReloadState = currentreloadstate;
+            //prevReloadState = currentreloadstate;
 
             // bool flip so that you dont hold down button and rapid fire
-            bool currentshootstate = m_controller.GetButton(A_BUTTON);
+            bool currentShootStateMain = m_controller.GetButton(A_BUTTON);  // A button for as trigger 
+            bool currentShootStateOne = m_controller.GetButton(X_BUTTON);   // Right Bumper + A button for shooting one cannon 
+            bool currentShootStateTwo = m_controller.GetButton(B_BUTTON);    // Left Bumper + A button for shooting six cannons
 
-            if (!prevShootState && currentshootstate)
+            if (!prevShootStateMain && currentShootStateMain)
             {
                 // starts timer
                 shootTimers[currentBarrel] = SHOOT_TIME;
@@ -161,42 +165,33 @@ namespace TShirtCannon
                 currentBarrel++;
                 if (currentBarrel > 5)
                     currentBarrel = 0;
-                Debug.Print("button press");
                 Debug.Print(currentBarrel.ToString());
             }
-            else if (prevShootState && !currentshootstate)
-            {
-                Debug.Print("button release");
-            }
-
-            prevShootState = currentshootstate;
 
             // secret shoot all 6 at same time command
-            //if (m_controller.GetButton(LEFT_BUMPER) && m_controller.GetButton(X_BUTTON) && m_controller.GetButton(Y_BUTTON))
-            //{
-            //    // starts all timers while flipping through barrels
-            //    for (int i = 0; i < shootTimers.Length; i++)
-            //    {
-            //        shootTimers[currentBarrel] = SHOOT_TIME;
-            //        currentBarrel++;
-            //        if (currentBarrel > 5)
-            //            currentBarrel = 0;
-            //    }
-            //}
-
-            // saftey so that if were reloading we cant shoot
-            if (reloading)
+            if (!prevShootStateTwo && currentShootStateTwo)
             {
+                // starts all timers while flipping through barrels
                 for (int i = 0; i < shootTimers.Length; i++)
                 {
-                    m_cannon.SetSolenoidOutput(i, false);
+                    shootTimers[currentBarrel] = SHOOT_TIME;
+                    currentBarrel++;
+                    if (currentBarrel > 5)
+                        currentBarrel = 0;
+
+                    Debug.Print(currentBarrel.ToString());
                 }
+                Debug.Print("Shoot Six");
             }
-            else
-            {
-                Shoot();
-                ReduceTimers();
-            }
+            else if (prevShootStateTwo && !currentShootStateTwo)
+                Debug.Print("End Shoot Six");
+
+            prevShootStateOne = currentShootStateOne;
+            prevShootStateTwo = currentShootStateTwo;
+            prevShootStateMain = currentShootStateMain;
+
+            Shoot();
+            ReduceTimers();
         }
 
         private static void Shoot()
