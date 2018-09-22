@@ -7,8 +7,6 @@ namespace TShirtCannon
 {
     public class Program
     {
-        // TODO AUSTIN: YOU NEED TO FIND BUTTON MAPPING ENUMS
-
         // ROBOT MAPPING 
         public const int RIGHT_MASTER_TALON = 1;
         public const int RIGHT_SLAVE_TALON = 2;
