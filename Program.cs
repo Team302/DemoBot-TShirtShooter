@@ -138,18 +138,6 @@ namespace TShirtCannon
         //shoots cannons each time shoot button is pressed in ascending order
         static void CannonShoot()
         {
-            //Debug.Print(currentBarrel.ToString());
-
-            // reload state
-            //bool currentreloadstate = m_controller.GetButton(LEFT_BUMPER);
-
-            //if (!prevReloadState && currentreloadstate)
-            //{
-            //    reloading = !reloading;
-            //}
-
-            //prevReloadState = currentreloadstate;
-
             // bool flip so that you dont hold down button and rapid fire
             bool currentShootStateMain = m_controller.GetButton(A_BUTTON);  // A button for as trigger 
             bool currentShootStateOne = m_controller.GetButton(X_BUTTON);   // Right Bumper + A button for shooting one cannon 
